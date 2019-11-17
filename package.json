@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "server": "nodemon app.js",
+    "server:debug": "nodemon --inspect app.js",
     "start": "node app.js"
   },
   "author": "",
