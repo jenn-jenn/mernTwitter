@@ -4,6 +4,7 @@ const User = require('../../models/User');
 const bcrypt = require("bcryptjs");
 const keys = require('../../config/keys');
 const jwt = require('jsonwebtoken');
+const passport = require("passport");
 
 // Can add routes here
 
@@ -11,6 +12,14 @@ const jwt = require('jsonwebtoken');
 router.get("/test", (req, res) => {
     res.json({msg: "This is the user route"});
 });
+
+router.get(
+    "/current", 
+    passport.authenticate("jwt", { session: false }), 
+    (req, res) => {
+        res.send(req.user);
+    }
+)
 
 // REGISTER route
 router.post('/register', (req, res) => {
