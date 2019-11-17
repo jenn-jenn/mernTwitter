@@ -2,13 +2,17 @@ const express = require("express");
 const router = express.Router();
 const User = require('../../models/User');
 const bcrypt = require("bcryptjs");
+const keys = require('../../config/keys');
+const jwt = require('jsonwebtoken');
 
 // Can add routes here
 
+// test route
 router.get("/test", (req, res) => {
     res.json({msg: "This is the user route"});
 });
 
+// REGISTER route
 router.post('/register', (req, res) => {
     User.findOne({email: req.body.email})
         .then( user => {
@@ -28,13 +32,50 @@ router.post('/register', (req, res) => {
                         newUser.password = hashPW;
                         newUser.save()
                             .then(user => res.json(user)) // after save, send back to frontend
-                            .catch(err => console.log(err));
-                    
+                            .catch(err => console.log(err));  
                     })
                 })
-
             }
         })
 })
+
+// LOGIN route
+router.post('/login', (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    User.findOne( {email} ) // ES6 destructure to get email; findOne gives back one, find gives arr
+        .then( user => {
+            if(!user) {
+                return res.status(404).json({ email: "This user does not exist"});
+            }
+            bcrypt.compare(password, user.password)
+                .then( isMatch => {
+                    if(isMatch) {
+                        // create jsonwebtoken and send back to client after logging in
+                        // create payload we are going to send back
+                        const payload = { // include user information
+                            id: user.id, // come from DB
+                            handle: user.handle,
+                            email: user.email
+                        }
+                        jwt.sign(
+                            payload,
+                            keys.secretOrKey,
+                            { expiresIn: 3600 },
+                            (err, token) => {
+                                res.json({
+                                    success: true, // created the webtoken
+                                    token: "Bearer " + token
+                                });
+                            }
+                        )
+                    } else {
+                        return res.status(400).json({password: "Incorrect Password"});
+                    }
+                })
+        })
+})
+
 
 module.exports = router;
