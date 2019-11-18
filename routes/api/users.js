@@ -5,7 +5,8 @@ const bcrypt = require("bcryptjs");
 const keys = require('../../config/keys');
 const jwt = require('jsonwebtoken');
 const passport = require("passport");
-
+const validateRegistInput = require('../../validations/register');
+const valideateLoginInput = require('../../validations/login');
 // Can add routes here
 
 // test route
@@ -13,16 +14,18 @@ router.get("/test", (req, res) => {
     res.json({msg: "This is the user route"});
 });
 
-router.get(
-    "/current", 
-    passport.authenticate("jwt", { session: false }), 
-    (req, res) => {
+router.get("/current", passport.authenticate("jwt", { session: false }), (req, res) => {
         res.send(req.user);
-    }
-)
+});
 
 // REGISTER route
 router.post('/register', (req, res) => {
+    const { errors, isValid } = validateRegistInput(req.body);
+
+    if(!isValid) {
+        return res.status(400).json(errors);
+    }
+
     User.findOne({email: req.body.email})
         .then( user => {
             if(user) { // user already existed
@@ -50,6 +53,12 @@ router.post('/register', (req, res) => {
 
 // LOGIN route
 router.post('/login', (req, res) => {
+
+    const { errors, isValid } = valideateLoginInput(req.body);
+    if(!isValid) {
+        return res.status(400).json(errors);
+    }
+
     const email = req.body.email;
     const password = req.body.password;
 

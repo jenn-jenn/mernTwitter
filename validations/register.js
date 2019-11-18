@@ -5,11 +5,12 @@ module.exports = function validateRegisterInput(data) {
     let errors = {};
 
     data.handle = validText(data.handle) ? data.handle : '';
+    debugger
     data.email = validText(data.email) ? data.email : '';
     data.pssword = validText(data.pssword) ? data.pssword : '';
     data.pssword2 = validText(data.pssword2) ? data.pssword2 : '';
 
-    if(!Validator.isLength(data.hendle, { min: 2, max: 30} )) {
+    if(!Validator.isLength(data.handle, { min: 2, max: 30} )) {
         errors.handle = "Handle must be between 2 and 30 characters";
     }
 
