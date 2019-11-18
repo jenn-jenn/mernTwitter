@@ -6,6 +6,8 @@ const users = require("./routes/api/users");
 const tweets = require("./routes/api/tweets");
 const User = require('./models/User');
 const bodyParser = require("body-parser"); // tells app what sort of request it should respond to
+const passport = require('passport');
+
 
 // Have mongoose connect to db
 mongoose.connect(db, { useNewUrlParser: true})
@@ -34,6 +36,11 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", users);
 app.use("/api/tweets", tweets);
+
+require('./config/passport')(passport);
+app.use(passport.initialize());
+
+
 
 // Listen on a given port
 const port = process.env.PORT || 5000;
