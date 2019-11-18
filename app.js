@@ -7,7 +7,14 @@ const tweets = require("./routes/api/tweets");
 const User = require('./models/User');
 const bodyParser = require("body-parser"); // tells app what sort of request it should respond to
 const passport = require('passport');
+const path = require('path');
 
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('frontend/build'));
+    app.get('/', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'frontend', 'build', 'index.html'));
+    })
+}
 
 // Have mongoose connect to db
 mongoose.connect(db, { useNewUrlParser: true})
